@@ -34,7 +34,7 @@ var Commands = class {
     _createButton(icon_name){
         return new St.Button({
             child: new St.Icon({icon_name: icon_name}),
-            style_class: 'system-menu-action'
+            style_class: 'icon-button',
         });
     }
 
