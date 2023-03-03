@@ -3,11 +3,14 @@ const Lang = imports.lang;
 const St = imports.gi.St;
 
 const ModalDialog = imports.ui.modalDialog;
+const GObject = imports.gi.GObject;
 
 const Gettext = imports.gettext.domain('redmine-issues');
 const _ = Gettext.gettext;
 
-const AddIssueDialog = class extends ModalDialog.ModalDialog {
+
+var AddIssueDialog = GObject.registerClass(
+class AddIssueDialog extends ModalDialog.ModalDialog {
 
     constructor(callback) {
         super();
@@ -48,4 +51,4 @@ const AddIssueDialog = class extends ModalDialog.ModalDialog {
         this.callback(text);
         this.close();
     }
-};
+});

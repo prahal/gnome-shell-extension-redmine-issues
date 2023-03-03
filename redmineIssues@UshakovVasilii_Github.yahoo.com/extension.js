@@ -27,7 +27,8 @@ const _ = Gettext.gettext;
 
 let redmineIssues = null;
 
-const RISource = class extends MessageTray.Source {
+const RISource = GObject.registerClass(
+class extends MessageTray.Source {
 
     createIcon(size) {
         return new St.Icon({
@@ -36,7 +37,7 @@ const RISource = class extends MessageTray.Source {
         });
     }
 
-};
+});
 
 
 const RedmineIssues = GObject.registerClass(class RedmineIssues_RedmineIssues extends PanelMenu.Button {
@@ -55,7 +56,7 @@ const RedmineIssues = GObject.registerClass(class RedmineIssues_RedmineIssues ex
             style_class: 'system-status-icon'
         });
 
-        this.actor.add_actor(this._extensionIcon);
+        this.add_actor(this._extensionIcon);
 
         this._debugEnabled = this._settings.get_boolean('logs');
         this._issuesStorage = new IssueStorage.IssueStorage();
@@ -606,10 +607,10 @@ const RedmineIssues = GObject.registerClass(class RedmineIssues_RedmineIssues ex
             }
         }
         if(unread) {
-            this._issueGroupItems[groupId].actor.add_style_class_name('ri-group-label-unread');
+            this._issueGroupItems[groupId].add_style_class_name('ri-group-label-unread');
             this._extensionIcon.gicon = this._gicon_unread;
         } else {
-            this._issueGroupItems[groupId].actor.remove_style_class_name('ri-group-label-unread');
+            this._issueGroupItems[groupId].remove_style_class_name('ri-group-label-unread');
             this._refreshIcon();
         }
     }
@@ -652,7 +653,7 @@ const RedmineIssues = GObject.registerClass(class RedmineIssues_RedmineIssues ex
     }
 
     _openAppPreferences(){
-        Util.spawn(["gnome-shell-extension-prefs", "redmineIssues@UshakovVasilii_Github.yahoo.com"]);
+        ExtensionUtils.openPrefs();
         this.menu.close();
     }
 

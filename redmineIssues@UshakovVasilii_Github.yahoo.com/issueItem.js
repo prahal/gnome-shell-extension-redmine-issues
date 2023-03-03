@@ -9,7 +9,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Сonstants = Me.imports.constants;
 
-const IssueItem = class {
+var IssueItem = class {
 
     constructor(issue, sortKey){
         this._settings = ExtensionUtils.getSettings();
@@ -19,19 +19,22 @@ const IssueItem = class {
         this.sortKey = sortKey;
 
         this._statusLabels = {};
-        this._label = new St.Label({text: '#' + issue.id + ' - ' + issue.subject});
+        this._label = new St.Label({
+            text: '#' + issue.id + ' - ' + issue.subject,
+            x_expand: true
+        });
         this.setMaxWidth(this._settings.get_int('max-subject-width'));
         let unread = issue.unread_fields.length > 0;
         if(unread)
             this._label.add_style_class_name('ri-issue-label-unread');
 
-        this.menuItem.actor.add(this._label,{x_fill: true, expand: true});
+        this.menuItem.add(this._label);
 
         this._statusLabelBox = new St.BoxLayout({style_class: 'ri-popup-menu-item-status-labels'});
-        this.menuItem.actor.add(this._statusLabelBox);
+        this.menuItem.add(this._statusLabelBox);
         this._addStatusLabels(issue);
         this._buttonBox = new St.BoxLayout();
-        this.menuItem.actor.add(this._buttonBox);
+        this.menuItem.add(this._buttonBox);
         this.markReadButton = new St.Button({
             child: new St.Icon({icon_name: 'object-select-symbolic', style_class: 'ri-issue-icon'})
         });

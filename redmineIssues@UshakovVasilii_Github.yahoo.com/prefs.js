@@ -23,7 +23,7 @@ var RedmineIssuesPrefsWidget = new GObject.registerClass(class RedmineIssuses_Re
         this._settings = ExtensionUtils.getSettings();
 
         // General tab
-        let generalTab = new Gtk.Grid({row_spacing:10,column_spacing:10, margin:10});
+        let generalTab = new Gtk.Grid({row_spacing:10,column_spacing:10, margin_start:10, margin_top:10, margin_end:10, margin_bottom:10});
         this.append_page(generalTab,  new Gtk.Label({label: _('General')}));
 
         let apiAccessKeyHelp = _('More information about authentication:') +
@@ -48,7 +48,7 @@ var RedmineIssuesPrefsWidget = new GObject.registerClass(class RedmineIssuses_Re
         this._settings.bind('auto-refresh', autoRefresh, 'value', Gio.SettingsBindFlags.DEFAULT);
 
         // Display tab
-        let displayTab = new Gtk.Grid({row_spacing:10,column_spacing:10, margin:10});
+        let displayTab = new Gtk.Grid({row_spacing:10,column_spacing:10, margin_start:10, margin_top:10, margin_end:10, margin_bottom:10});
         this.append_page(displayTab,  new Gtk.Label({label: _('Display')}));
         let i = 0;
 
@@ -114,7 +114,12 @@ var RedmineIssuesPrefsWidget = new GObject.registerClass(class RedmineIssuses_Re
         this._settings.bind('min-menu-item-width', minMenuItemWidth, 'value', Gio.SettingsBindFlags.DEFAULT);
 
         // Filters tab
-        let filtersTab = new Gtk.Grid({row_spacing:10,column_spacing:10, margin:10});
+        let filtersTab = new Gtk.Grid({
+            row_spacing:10,
+            column_spacing:10,
+            margin_start:10, margin_top:10, margin_end:10, margin_bottom:10,
+            vexpand: false, hexpand: false
+        });
         this.append_page(filtersTab,  new Gtk.Label({label: _('Filters')}));
 
         let filterHelp = _('Examples:') + '\n<i>status_id=1&amp;project_id=my-project</i>\n' +
@@ -124,8 +129,9 @@ var RedmineIssuesPrefsWidget = new GObject.registerClass(class RedmineIssuses_Re
 
         let filtersData = this._settings.get_strv('filters');
         this._filtersBuffer = new Gtk.TextBuffer({ text: filtersData.join('\n')});
-        let filtersScroll = new Gtk.ScrolledWindow({expand : true, shadow_type: Gtk.ShadowType.ETCHED_IN});
-        filtersScroll.add_with_viewport(new Gtk.TextView({buffer :  this._filtersBuffer}));
+        let filtersScroll = new Gtk.ScrolledWindow({vexpand: true, hexpand: true});
+        filtersScroll.set_has_frame(true);
+        filtersScroll.set_child(new Gtk.TextView({buffer :  this._filtersBuffer}));
         this._filtersBuffer.connect('changed', Lang.bind(this, this._filtersChanged));
         filtersTab.attach(filtersScroll, 0, 1, 1, 1);
 
@@ -191,6 +197,5 @@ var RedmineIssuesPrefsWidget = new GObject.registerClass(class RedmineIssuses_Re
 
 function buildPrefsWidget() {
     let w = new RedmineIssuesPrefsWidget();
-    w.show_all();
     return w;
 }

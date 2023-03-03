@@ -7,7 +7,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Сonstants = Me.imports.constants;
 
-const IssueStorage = class {
+var IssueStorage = class {
 
     constructor() {
 

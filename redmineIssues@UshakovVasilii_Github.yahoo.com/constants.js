@@ -1,4 +1,4 @@
-const LABEL_KEYS = [
+var LABEL_KEYS = [
     'status',
     'assigned_to',
     'tracker',
