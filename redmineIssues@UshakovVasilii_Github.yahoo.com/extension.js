@@ -8,10 +8,10 @@ const Soup = imports.gi.Soup;
 const Util = imports.misc.util;
 const Lang = imports.lang;
 const Gio = imports.gi.Gio;
+const GLib = imports.gi.GLib;
 const GObject = imports.gi.GObject;
 
-const session = new Soup.SessionAsync();
-Soup.Session.prototype.add_feature.call(session, new Soup.ProxyResolverDefault());
+const session = new Soup.Session();
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -321,12 +321,24 @@ const RedmineIssues = GObject.registerClass(class RedmineIssues_RedmineIssues ex
            this._continueOrFinishIssuesLoading(filter);
            return;
         }
-        request.request_headers.append('X-Redmine-API-Key', this._settings.get_string('api-access-key'));
+        request.get_request_headers().append('X-Redmine-API-Key', this._settings.get_string('api-access-key'));
 
-        session.queue_message(request, Lang.bind(this, function(session, response) {
-            this._debug('Filter "' + filter + '" loaded, status_code=' + response.status_code);
-            if(response.status_code == 200){
-                let issues=JSON.parse(response.response_body.data).issues;
+        session.send_and_read_async(request, GLib.PRIORITY_DEAFULT, null,
+            Lang.bind(this, function(session, result) {
+            let response;
+            let bytes;
+            try {
+                bytes = session.send_and_read_finish(result);
+            } catch (error) {
+                this._debug(error);
+                return;
+            }
+            let decoder = new TextDecoder('utf-8')
+            let body = decoder.decode(bytes.get_data());
+            response = session.get_async_result_message(result);
+            this._debug('Filter "' + filter + '" loaded, status_code=' + response.get_status());
+            if(response.get_status() == 200){
+                let issues=JSON.parse(body).issues;
                 if(issues && issues.length > 0){
                     this._debug('issues count=' + issues.length);
                     for(let i in issues){
@@ -384,12 +396,24 @@ const RedmineIssues = GObject.registerClass(class RedmineIssues_RedmineIssues ex
             return;
         }
 
-        request.request_headers.append('X-Redmine-API-Key', this._settings.get_string('api-access-key'));
+        request.get_request_headers().append('X-Redmine-API-Key', this._settings.get_string('api-access-key'));
 
-        session.queue_message(request, Lang.bind(this, function(session, response) {
-            this._debug('Issue "' + id + '" loaded, status_code=' + response.status_code);
-            if(response.status_code == 200){
-                let issue=JSON.parse(response.response_body.data).issue;
+        session.send_and_read_async(request, GLib.PRIORITY_DEFAULT, null,
+            Lang.bind(this, function(session, result) {
+            let response;
+            let bytes;
+            try {
+                bytes = session.send_and_read_finish(result);
+            } catch (error) {
+                this._debug(error);
+                return;
+            }
+            let decoder = new TextDecoder('utf-8')
+            let body = decoder.decode(bytes.get_data());
+            response = session.get_async_result_message(result);
+            this._debug('Issue "' + id + '" loaded, status_code=' + response.get_status());
+            if(response.get_status() == 200){
+                let issue=JSON.parse(body).issue;
                 callback(this._convertIssueFromResponse(issue));
             } else if(response.status_code && response.status_code >= 100) {
                 this._notify(_('Warning'), _('Cannot load issue #%s, error status_code=%s').format(id, response.status_code));
